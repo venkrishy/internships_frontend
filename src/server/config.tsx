@@ -27,7 +27,9 @@ const config = {
     DIST_URL: isLocal ? "http://localhost:8080" : String(process.env.APP_DIST_URL),
     /** Where the contents of the `public` folder are hosted (might be the same as `config.app.DIST_URL`) */
     PUBLIC_URL: isLocal ? "http://localhost:8080" : String(process.env.APP_PUBLIC_URL),
-    INTERNSHIPS_ENDPOINT: isLocal ? "http://localhost:4000/parse" : String(process.env.INTERNSHIPS_ENDPOINT),
+    IS_LOCAL: isLocal,
+    INTERNSHIPS_ENDPOINT: isLocal ? 'http://localhost:4000/parse' : String(process.env.INTERNSHIPS_ENDPOINT),
+    INTERNSHIPS_LOCALHOST_ENDPOINT: 'http://localhost:4000/parse'
   },
 };
 

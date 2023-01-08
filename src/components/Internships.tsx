@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import useConfig from "./useConfig";
 import ReactDOM from 'react-dom';
+import MOCK_DATA from './MOCK_DATA.json';
 
 interface href_type {
     anchor_text: string,
     link_target: string
 }
-interface InternshipType { name: string, name_html: string, location: string, location_html: string, closed: boolean, notes: string, notes_html: "", notes_hrefs: href_type[] };
+interface InternshipType { name: string, name_html: string, location: string, location_html: string, closed: boolean, notes: string, notes_html: string, notes_hrefs: href_type[] };
 
 const generateKey = (internship: InternshipType) => {
     return `${internship.name}_${new Date().getTime()}`;
@@ -55,17 +56,28 @@ const createRows = (internships: InternshipType[] ) => {
     });
 };
 
-const InternshipsComponent = () => {
+const InternshipsComponent = function() {
     const config = useConfig();
     const [internships, setInternships] = useState<InternshipType[] | undefined>(undefined);
+    const href_record : href_type = {anchor_text: "string", link_target: "string"}
+    const href_records: href_type[] = [href_record]
+    const record: InternshipType = { name: "", name_html: "name_html", location: "string", location_html: "location_html", closed: false, notes: "string", notes_html: "notes_html", notes_hrefs: href_records };
+    const records: InternshipType[] = [record];
+
     useEffect(() => {
-        fetch(encodeURI(config.app.INTERNSHIPS_ENDPOINT)).then(resp => {
-            return resp.json();
-        }).then(data => {
-            setInternships(data.reverse());
-        }).catch(error => {
-            console.log(error);
-        });
+        if (config.app.IS_LOCAL) {
+            console.log("Loading Mock Data from MOCK_DATA.JSON file");
+            setInternships(MOCK_DATA.reverse());
+        } else {
+            console.log("config.app.INTERNSHIPS_ENDPOINT", config.app.INTERNSHIPS_ENDPOINT);
+            fetch(encodeURI(config.app.INTERNSHIPS_ENDPOINT)).then(resp => {
+                return resp.json();
+            }).then(data => {
+                setInternships(records.reverse());
+            }).catch(error => {
+                console.log(error);
+            });
+        }
     }, [])
     return (
         <div className="internships">
