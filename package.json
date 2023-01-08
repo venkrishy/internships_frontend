@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "cross-env IS_LOCAL=1 concurrently --kill-others \"npm run start:devserver\" \"npm run start:offline\"",
+    "start": "cross-env IS_LOCAL=1 LOAD_MOCK_JSON=1 concurrently --kill-others \"yarn run start:devserver\" \"yarn run start:offline\"",
+    "start:load_localhost": "cross-env IS_LOCAL=1 LOAD_FROM_LOCALHOST=1 concurrently --kill-others \"yarn run start:devserver\" \"yarn run start:offline\"",
+    "start:load_dev": "cross-env IS_LOCAL=1 LOAD_FROM_DEV_SERVER=1 concurrently --kill-others \"yarn run start:devserver\" \"yarn run start:offline\"",
     "start:devserver": "webpack serve --config webpack.browser.config.js --mode development",
     "start:offline": "sls offline start",
     "build:serverless": "sls package",

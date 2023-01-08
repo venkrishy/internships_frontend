@@ -28,7 +28,10 @@ const config = {
     /** Where the contents of the `public` folder are hosted (might be the same as `config.app.DIST_URL`) */
     PUBLIC_URL: isLocal ? "http://localhost:8080" : String(process.env.APP_PUBLIC_URL),
     IS_LOCAL: isLocal,
-    INTERNSHIPS_ENDPOINT: isLocal ? 'http://localhost:4000/parse' : String(process.env.INTERNSHIPS_ENDPOINT),
+    INTERNSHIPS_ENDPOINT: String(process.env.INTERNSHIPS_ENDPOINT),
+    LOAD_MOCK_JSON: process.env.LOAD_MOCK_JSON,
+    LOAD_FROM_LOCALHOST: process.env.LOAD_FROM_LOCALHOST,
+    LOAD_FROM_DEV_SERVER: process.env.LOAD_FROM_DEV_SERVER,
     INTERNSHIPS_LOCALHOST_ENDPOINT: 'http://localhost:4000/parse'
   },
 };

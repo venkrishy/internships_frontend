@@ -59,21 +59,25 @@ const createRows = (internships: InternshipType[] ) => {
 const InternshipsComponent = function() {
     const config = useConfig();
     const [internships, setInternships] = useState<InternshipType[] | undefined>(undefined);
-    const href_record : href_type = {anchor_text: "string", link_target: "string"}
-    const href_records: href_type[] = [href_record]
-    const record: InternshipType = { name: "", name_html: "name_html", location: "string", location_html: "location_html", closed: false, notes: "string", notes_html: "notes_html", notes_hrefs: href_records };
-    const records: InternshipType[] = [record];
 
     useEffect(() => {
-        if (config.app.IS_LOCAL) {
+        if (config.app.LOAD_MOCK_JSON) {
             console.log("Loading Mock Data from MOCK_DATA.JSON file");
             setInternships(MOCK_DATA.reverse());
-        } else {
-            console.log("config.app.INTERNSHIPS_ENDPOINT", config.app.INTERNSHIPS_ENDPOINT);
-            fetch(encodeURI(config.app.INTERNSHIPS_ENDPOINT)).then(resp => {
+        } 
+        else {
+            let internships_endpoint: string = config.app.INTERNSHIPS_ENDPOINT;
+            if (config.app.LOAD_FROM_LOCALHOST) {
+                internships_endpoint = config.app.INTERNSHIPS_LOCALHOST_ENDPOINT;
+                console.log("Loading from localhost");
+            } else {
+                console.log("Loading from dev server");
+            }
+            console.log("internships_endpoint", internships_endpoint);
+            fetch(encodeURI(internships_endpoint)).then(resp => {
                 return resp.json();
             }).then(data => {
-                setInternships(records.reverse());
+                setInternships(data.reverse());
             }).catch(error => {
                 console.log(error);
             });
