@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import useConfig from "./useConfig";
 import ReactDOM from 'react-dom';
-import MOCK_DATA from './MOCK_DATA.json';
+import MOCK_DATA from './MOCK_DATA2.json';
 
 interface href_type {
     anchor_text: string,
