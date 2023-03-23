@@ -9,6 +9,7 @@ import logo from "./logo.svg";
 //import BasicTable  from "./components/BasicTable";
 import SortingTable  from "./components/SortingTable";
 import PaginationTable  from "./components/PaginationTable";
+import Internships from "./components/Internships";
 
 /**
  * Our Web Application
@@ -20,7 +21,7 @@ export default function App() {
   return (
     <div className="App" >
       <h1 className="App-title">Welcome to {config.app.TITLE}</h1>
-      <PaginationTable />
+      <Internships />
     </div>
   );
 }

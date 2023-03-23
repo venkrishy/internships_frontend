@@ -1,69 +1,28 @@
-import React, { useEffect, useState } from "react";
-import useConfig from "./useConfig";
-import ReactDOM from 'react-dom';
+import React, { useState, useEffect, useMemo } from 'react';
+import axios from 'axios';
+import { useTable, Column, useFilters, useGlobalFilter, useSortBy } from 'react-table';
+import { ColumnFilter } from './ColumnFilter';
+import { GlobalFilter } from './GlobalFilter';
+import useConfig from './useConfig';
 import MOCK_DATA from './MOCK_DATA2.json';
+import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import BTable from 'react-bootstrap/Table';
 
 interface href_type {
     anchor_text: string,
     link_target: string
 }
-interface InternshipType { name: string, name_html: string, location: string, location_html: string, closed: boolean, notes: string, notes_html: string, notes_hrefs: href_type[] };
+interface UserData { name: string, name_html: string, location: string, location_html: string, closed: boolean, notes: string, notes_html: string, notes_hrefs: href_type[] };
 
-const generateKey = (internship: InternshipType) => {
-    return `${internship.name}_${new Date().getTime()}`;
-}
-
-const getInternshipsToRenderer = (internships: InternshipType[]) => {
-    if (!internships) {
-        console.log("internships is null");
-        return;
-    }
-    let output = (
-        <div id="internships">
-            <table id="internships_table" className="table is-striped">
-                <thead>
-                    <tr>
-                        <th className="has-text-centered">Name</th>
-                        <th className="has-text-centered">Location</th>
-                        <th className="has-text-centered">Notes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {createRows(internships)}
-                </tbody>
-            </table>
-        </div>
-    );
-    return output;
-};
-
-const createRows = (internships: InternshipType[] ) => {
-    if (!internships) {
-        console.log("internships is null");
-        return;
-    }
-    return internships.map((internship: InternshipType, idx: number) => {
-        var name_html = { __html: internship.name_html }
-        var notes_html = { __html: internship.notes_html }
-        var location_html = { __html: internship.location_html }
-        return (
-            <tr key={idx + "_" + generateKey(internship)}>
-                <td><div dangerouslySetInnerHTML={name_html} /></td>
-                <td><div dangerouslySetInnerHTML={location_html} /></td>
-                <td><div dangerouslySetInnerHTML={notes_html} /></td>
-            </tr>
-        )
-    });
-};
-
-const InternshipsComponent = function() {
+function InternshipsComponent() {
     const config = useConfig();
-    const [internships, setInternships] = useState<InternshipType[] | undefined>(undefined);
+  const [data, setData] = useState<UserData[]>([]);
 
     useEffect(() => {
+    const fetchData = async () => {
         if (config.app.LOAD_MOCK_JSON) {
             console.log("Loading Mock Data from MOCK_DATA.JSON file");
-            setInternships(MOCK_DATA.reverse());
+            setData(MOCK_DATA.reverse())
         } 
         else {
             let internships_endpoint: string = config.app.INTERNSHIPS_ENDPOINT;
@@ -74,20 +33,91 @@ const InternshipsComponent = function() {
                 console.log("Loading from dev server");
             }
             console.log("internships_endpoint", internships_endpoint);
-            fetch(encodeURI(internships_endpoint)).then(resp => {
-                return resp.json();
-            }).then(data => {
-                setInternships(data.reverse());
-            }).catch(error => {
-                console.log(error);
-            });
+            const result = await axios.get<UserData[]>(internships_endpoint);
+            setData(result.data);
         }
-    }, [])
+    };
+
+    fetchData();
+  }, []);
+
+  const columns = useMemo(
+    () => [
+      {
+        Header: 'Name',
+        accessor: 'name' as const,
+      },
+      {
+        Header: 'Location',
+        accessor: 'location' as const,
+      },
+      {
+        Header: 'Notes',
+        accessor: 'notes' as const,
+      },
+    ],
+    []
+  );
+
+  const tableInstance = useTable({ columns, data });
+
+  const defaultColumn = useMemo(() =>{
+    return {
+        Filter: ColumnFilter
+    }
+    },[])
+
+    const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    footerGroups,
+    rows,
+    prepareRow,
+    state,
+    setGlobalFilter
+    } = useTable({
+    columns,
+    data,
+    defaultColumn
+    }, useFilters, useGlobalFilter, useSortBy)
+
+  const { globalFilter } = state
+
+  return (
+    <>
+    <GlobalFilter filter = {globalFilter} setFilter={setGlobalFilter} />
+    <BTable striped bordered hover size="sm" {...getTableProps()}>
+      <thead>
+        {headerGroups.map((headerGroup) => (
+          <tr {...headerGroup.getHeaderGroupProps()}>
+            {headerGroup.headers.map((column, headCellIndex) => (
+              <th className="text-center" {...column.getHeaderProps(column.getSortByToggleProps())} key={headCellIndex}>
+              {column.render('Header')}
+              <span>
+                  {column.isSorted ? (column.isSortedDesc ? ' ⬇️' : '⬆️') : ''}
+              </span> 
+              <div>{column.canFilter ? column.render('Filter') : null}</div>
+          </th>
+            ))}
+          </tr>
+        ))}
+      </thead>
+      <tbody {...getTableBodyProps()}>
+        {rows.map((row, i) => {
+          prepareRow(row);
     return (
-        <div className="internships">
-            {internships && getInternshipsToRenderer(internships) }
-        </div>
-    )
+            <tr {...row.getRowProps()}>
+              {row.cells.map((cell) => {
+                return <td {...cell.getCellProps()}> {cell.render('Cell')}  </td>;
+              })}
+            </tr>
+          );
+        })}
+      </tbody>
+    </BTable>
+    </>
+  );
 }
 
 export {InternshipsComponent as default}
