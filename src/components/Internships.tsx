@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react";
-import useConfig from "./useConfig";
 import ReactDOM from 'react-dom';
+import useConfig from "./useConfig";
 import MOCK_DATA from './MOCK_DATA.json';
+import InternshipType from "./InternshipType";
 
-interface href_type {
-    anchor_text: string,
-    link_target: string
-}
-interface InternshipType { name: string, name_html: string, location: string, location_html: string, closed: boolean, notes: string, notes_html: string, notes_hrefs: href_type[] };
 
 const generateKey = (internship: InternshipType) => {
     return `${internship.name}_${new Date().getTime()}`;

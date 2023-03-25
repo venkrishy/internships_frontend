@@ -6,7 +6,7 @@ import 'bulma/css/bulma.min.css'
 import useConfig from "./components/useConfig";
 import logo from "./logo.svg";
 import Internships from "./components/Internships";
-
+import DataTableTS from "./components/DataTableTS";
 
 /**
  * Our Web Application
@@ -16,9 +16,6 @@ export default function App() {
   const config = useConfig();
 
   return (
-    <div className="App has-background-primary" >
-      <h1 className="App-title has-text-white">Welcome to {config.app.TITLE}</h1>
-      <Internships />
-    </div>
+      <DataTableTS />
   );
 }
