@@ -4,6 +4,10 @@ import SearchIcon from '@mui/icons-material/Search';
 import useConfig from "./useConfig";
 import MOCK_DATA from './MOCK_DATA.json';
 import InternshipType from "./InternshipType";
+import HiveIcon from '@mui/icons-material/Hive';
+import makeStyles from '@mui/styles/makeStyles';
+import logo from "/public/logo.png";
+
 
 const DataTableTS = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSizeChange, onRowClick }: any) => {
 
@@ -98,46 +102,41 @@ const DataTableTS = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSi
     }))
     const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
-    const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
-        null
-    );
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
         null
     );
 
-    const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorElNav(event.currentTarget);
-    };
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElUser(event.currentTarget);
-    };
-
-    const handleCloseNavMenu = () => {
-        setAnchorElNav(null);
     };
 
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
- 
+
+    const useStyles = makeStyles((theme) => ({
+        iconButton: {
+          color: 'yellow',
+        },
+      }));
+    const classes = useStyles();
     return (
         <>
             <AppBar position="static">
-                <Container maxWidth="xl">
+                <Container maxWidth="md">
                     <Toolbar disableGutters>
+                        <img src={logo} alt="logo"/>
                         <Typography
                             variant="h6"
                             noWrap
-                            component="a"
-                            href=""
                             sx={{
                                 mr: 2,
                                 //display: { xs: 'flex', md: 'none' },
                                 flexGrow: 0,
-                                fontFamily: 'monospace',
+                                fontFamily: 'Raleway',
                                 fontWeight: 700,
                                 letterSpacing: '.3rem',
-                                //color: 'inherit',
+                                color: 'inherit',
                                 textDecoration: 'none',
                                 align: 'center',
                                 flex: 1,
@@ -179,7 +178,7 @@ const DataTableTS = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSi
                     </Toolbar>
                 </Container>
             </AppBar>
-            <Grid container spacing={1} style={{ marginLeft: ".5em", marginTop: ".5em" , marginBottom: ".5em"}} columns={{ xs: 1, sm: 3 }}>
+            <Grid container spacing={1} style={{ marginLeft: ".5em", marginTop: ".5em", marginBottom: ".5em" }} columns={{ xs: 1, sm: 3 }}>
                 <Grid item p="1">
                     <TextField
                         placeholder="Name"
@@ -187,7 +186,7 @@ const DataTableTS = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSi
                         variant="outlined"
                         fullWidth
                         size="small"
-                        //onChange={handleSearchFieldOnChange}
+                    //onChange={handleSearchFieldOnChange}
                     />
                 </Grid>
                 <Grid item>
@@ -197,7 +196,7 @@ const DataTableTS = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSi
                         variant="outlined"
                         fullWidth
                         size="small"
-                        //onChange={handleSearchFieldOnChange}
+                    //onChange={handleSearchFieldOnChange}
                     />
                 </Grid>
                 <Grid item>
@@ -207,7 +206,7 @@ const DataTableTS = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSi
                         variant="outlined"
                         fullWidth
                         size="small"
-                        //onChange={handleSearchFieldOnChange}
+                    //onChange={handleSearchFieldOnChange}
                     />
                 </Grid>
                 <Grid item>
