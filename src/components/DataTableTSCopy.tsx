@@ -3,27 +3,17 @@ import { Button, TextField, AppBar, Grid, Paper, Table, styled, TableRow, TableC
 import SearchIcon from '@mui/icons-material/Search';
 import useConfig from "./useConfig";
 import MOCK_DATA from './MOCK_DATA.json';
-import InternshipType from "./InternshipType";
 import HiveIcon from '@mui/icons-material/Hive';
 import makeStyles from '@mui/styles/makeStyles';
 import logo from "/public/logo.png";
 import { createInternHive, updateInternHive, deleteInternHive } from '../graphql/mutations'
-import { API } from 'aws-amplify';
-import * as queries from '../graphql/queries';
-import { GraphQLQuery } from '@aws-amplify/api';
-import { ListInternHivesQuery, ModelInternHiveFilterInput } from "../API"; 
-import { GraphQLInternshipType } from './GraphQLInternshipType';
+import { listInternHives } from '../graphql/queries'
+import { Amplify, API, graphqlOperation} from "aws-amplify";
+import InternshipType from './InternshipType';
 
+const DataTableTSCopy = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSizeChange, onRowClick }: any) => {
 
-const MyQuery = `query MyQuery {
-    listInternHives {
-      items {
-        id name location notes
-      }
-    }
-  }`
-
-const DataTableTS = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSizeChange, onRowClick }: any) => {
+    
     
     const config = useConfig();
     const Item = styled(Paper)(({ theme }) => ({
@@ -33,39 +23,44 @@ const DataTableTS = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSi
         textAlign: 'center',
         color: theme.palette.text.secondary,
     }));
-    const [rows, setRows] = useState<InternshipType[]>([]);
-    const columns = [
-        { id: 'name', label: 'Name', minWidth: 170 },
-        { id: 'location', label: 'Location', minWidth: 170 },
-        { id: 'notes', label: 'Notes', minWidth: 170 },
+
+    interface IColumn {
+        align?: "center" | "left" | "right" | "inherit" | "justify" | undefined;
+        id: "name_html" | "location_html" | "notes_html";
+        label: string;
+        minWidth: number;
+    }
+    const columns  : IColumn[] = [
+        { id: 'name_html', label: 'Name', minWidth: 170 },
+        { id: 'location_html', label: 'Location', minWidth: 170 },
+        { id: 'notes_html', label: 'Notes', minWidth: 170 },
     ]
+    const [rows, setRows] = useState<InternshipType[]>([]);
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+    const [sortColumn, setSortColumn] = useState<string>(columns[0].id);
+
+    const handleSort = (field :string) => {
+        let sorted: InternshipType[] = [];
+           
+        if (sortColumn === field) {
+          if (sortOrder === 'asc') {
+            sorted = [...rows].sort((a, b) => a[field] > b[field] ? -1 : 1);
+            setSortOrder('desc');
+          } else {
+            sorted = [...rows].sort((a, b) => a[field] < b[field] ? -1 : 1);
+            setSortOrder('asc');
+          }
+        } else {
+          sorted = [...rows].sort((a, b) => a[field] > b[field] ? 1 : -1);
+          setSortOrder('asc');
+          setSortColumn(field);
+        }
+    
+        setRows(sorted);
+      };
 
     useEffect(() => {
-        async function fetchData() {
-      try {
-        let filter : ModelInternHiveFilterInput= {name: {contains: "Amazon"}};
-        const allInternships = await API.graphql<GraphQLQuery<ListInternHivesQuery>>(
-            { query: queries.listInternHives, variables: {filter: filter }  }
-          );
-        console.log("allInternships", allInternships);
-        
-
-        const result2 = allInternships.data?.listInternHives?.items;
-        const result3 : InternshipType[] = !result2 ? [] : result2?.map((item ) => {
-            return {
-                name: item ? item?.name : "",
-                location: item ? item?.location : "",
-                notes: item ? item?.notes :"",
-            }
-        })
-        setRows(result3);
-      } catch (error) {
-        console.log("Error fetching data: ", error);
-      }
-    }
-
-    fetchData();
-    /*    if (config.app.LOAD_MOCK_JSON) {
+        if (config.app.LOAD_MOCK_JSON) {
             console.log("Loading Mock Data from MOCK_DATA.JSON file");
             setRows(MOCK_DATA.reverse());
         }
@@ -83,9 +78,9 @@ const DataTableTS = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSi
             }).then(data => {
                 setRows(data.reverse());
             }).catch(error => {
-        console.log(error);
+                console.log(error);
             });
-    }*/
+        }
     }, [])
 
     const [selected, setSelected] = useState([0])
@@ -216,14 +211,38 @@ const DataTableTS = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSi
                 </Container>
             </AppBar>
             <Grid container spacing={1} style={{ marginLeft: ".5em", marginTop: ".5em", marginBottom: ".5em" }} columns={{ xs: 1, sm: 3 }}>
-                <Grid item>
-                    <Button variant="contained">Frontend</Button>
+                <Grid item p="1">
+                    <TextField
+                        placeholder="Name"
+                        type="search"
+                        variant="outlined"
+                        fullWidth
+                        size="small"
+                    //onChange={handleSearchFieldOnChange}
+                    />
                 </Grid>
                 <Grid item>
-                    <Button variant="contained">Backend</Button>
+                    <TextField
+                        placeholder="Location"
+                        type="search"
+                        variant="outlined"
+                        fullWidth
+                        size="small"
+                    //onChange={handleSearchFieldOnChange}
+                    />
                 </Grid>
                 <Grid item>
-                    <Button variant="contained">Open</Button>
+                    <TextField
+                        placeholder="Notes"
+                        type="search"
+                        variant="outlined"
+                        fullWidth
+                        size="small"
+                    //onChange={handleSearchFieldOnChange}
+                    />
+                </Grid>
+                <Grid item>
+                    <Button variant="contained" startIcon={<SearchIcon />} />
                 </Grid>
             </Grid>
             <Grid>
@@ -231,9 +250,15 @@ const DataTableTS = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSi
                     <Table  aria-label="customized table">
                         <TableHead>
                             <TableRow>
-                                {columns.map((column: any) => (
+                                {columns.map((column) => (
                                     <StyledTableCell key={column.id} align={column.align}>
-                                        {column.label}
+                                       <TableSortLabel 
+                                       active={sortColumn === column.id} 
+                                       direction={sortColumn === column.id ? sortOrder : 'asc'} 
+                                       onClick={() => handleSort(column)}
+                                       >
+                                        {column.label} direction={sortColumn === column.id} 
+                                        </TableSortLabel>
                                     </StyledTableCell>
                                 ))}
                             </TableRow>
@@ -281,4 +306,4 @@ const DataTableTS = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSi
         </>
     )
 }
-export { DataTableTS as default }
+export { DataTableTSCopy as default }

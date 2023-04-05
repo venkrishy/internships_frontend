@@ -39,9 +39,9 @@ const createRows = (internships: InternshipType[] ) => {
         return;
     }
     return internships.map((internship: InternshipType, idx: number) => {
-        var name_html = { __html: internship.name_html }
-        var notes_html = { __html: internship.notes_html }
-        var location_html = { __html: internship.location_html }
+        var name_html =  { __html: internship?.name_html! } 
+        var notes_html = { __html: internship?.notes_html! } 
+        var location_html ={ __html: internship?.location_html! } 
         return (
             <tr key={idx + "_" + generateKey(internship)}>
                 <td><div dangerouslySetInnerHTML={name_html} /></td>

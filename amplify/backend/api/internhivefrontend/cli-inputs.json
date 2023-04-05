@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "serviceConfiguration": {
+    "apiName": "internhivefrontend",
+    "serviceName": "AppSync",
+    "defaultAuthType": {
+      "mode": "API_KEY",
+      "expirationTime": 30,
+      "apiKeyExpirationDate": "2023-05-05T01:58:52.016Z",
+      "keyDescription": "Internhivefrontend-dev"
+    },
+    "conflictResolution": {},
+    "additionalAuthTypes": []
+  }
+}
