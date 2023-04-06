@@ -7,7 +7,6 @@ import useConfig from "./components/useConfig";
 import logo from "./logo.svg";
 import Internships from "./components/Internships";
 import DataTableTS from "./components/DataTableTS";
-
 import { Amplify } from "aws-amplify";
 import awsconfig from "./aws-exports";
 Amplify.configure(awsconfig);
