@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { Button, TextField, AppBar, Grid, Paper, Table, styled, TableRow, TableCell, TableHead, TableBody, TableContainer, TablePagination, tableCellClasses, Typography, Box, Toolbar, IconButton, Menu, Container, Avatar, Tooltip, MenuItem, InputBase, alpha, TableSortLabel } from '@mui/material'
-import SearchIcon from '@mui/icons-material/Search';
+import { Button, ToggleButton, Grid, Paper, Table, styled, TableRow, TableCell, TableHead, TableBody, TableContainer, TablePagination, tableCellClasses, Typography, Box, Toolbar, IconButton, Menu, Container, Avatar, Tooltip, MenuItem, InputBase, alpha, TableSortLabel } from '@mui/material'
 import useConfig from "./useConfig";
-import MOCK_DATA from './MOCK_DATA.json';
 import InternshipType from "./InternshipType";
-import HiveIcon from '@mui/icons-material/Hive';
-import makeStyles from '@mui/styles/makeStyles';
+import { MyToggleButtonGroup } from "./MyToggleButtonGroup";
+
 
 import { API } from 'aws-amplify';
 import * as queries from '../graphql/queries';
@@ -17,13 +15,6 @@ import { MyAppBar } from './MyAppBar';
 const DataTableTS = ({ givenPageSize = 25, givenPage = 0, onPageChange, onPageSizeChange, onRowClick }: any) => {
 
     const config = useConfig();
-    const Item = styled(Paper)(({ theme }) => ({
-        backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-        ...theme.typography.body2,
-        padding: theme.spacing(2),
-        textAlign: 'center',
-        color: theme.palette.text.secondary,
-    }));
     const [rows, setRows] = useState<InternshipType[]>([]);
     const columns = [
         { id: 'name', label: 'Name', minWidth: 170 },
@@ -33,7 +24,6 @@ const DataTableTS = ({ givenPageSize = 25, givenPage = 0, onPageChange, onPageSi
     const [selected, setSelected] = useState([0])
     const [page, setPage] = useState(givenPage)
     const [pageSize, setPageSize] = useState(givenPageSize)
-    const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
 
     const StyledTableCell = styled(TableCell)(({ theme }: any) => ({
         [`&.${tableCellClasses.head}`]: {
@@ -125,6 +115,34 @@ const DataTableTS = ({ givenPageSize = 25, givenPage = 0, onPageChange, onPageSi
         setSelected(newSelected)
     }
 
+    const handleFilterButtonClickArray = async () => {
+        const frontEndArraySearchValues  = ['Front End', 'Front', 'front'];
+        const backEndArraySearchValues = ['Back End', 'Back', 'back'];
+        const searchString : string[] | never[] = frontEndArraySearchValues.concat(backEndArraySearchValues);
+        
+        let orValues = [];
+        for (let i = 0; i < searchString.length; i++) {
+            orValues.push({ notes: { contains: searchString[i] } });
+        };
+
+        let filter: ModelInternHiveFilterInput = {or: orValues};
+    
+        const filteredInternships = await API.graphql<GraphQLQuery<ListInternHivesQuery>>({
+            query: queries.listInternHives,
+            variables: { filter: filter },
+        });
+    
+        const result2 = filteredInternships.data?.listInternHives?.items;
+        const result3 = !result2 ? [] : result2?.map((item) => {
+            return {
+                name: item ? item?.name : '',
+                location: item ? item?.location : '',
+                notes: item ? item?.notes : '',
+            };
+        });
+        setRows(result3);
+    };
+
     const handleFilterButtonClick = async (searchString: string) => {
         let filter: ModelInternHiveFilterInput = { notes: { contains: searchString } };
         const filteredInternships = await API.graphql<GraphQLQuery<ListInternHivesQuery>>({
@@ -142,36 +160,26 @@ const DataTableTS = ({ givenPageSize = 25, givenPage = 0, onPageChange, onPageSi
         });
         setRows(result3);
     };
-    const handleFilterClick = (filter: string) => {
-        setSelectedFilters((prevFilters) => {
-            if (prevFilters.includes(filter)) {
-                return prevFilters.filter((f) => f !== filter);
-            } else {
-                return [...prevFilters, filter];
-            }
-        });
-    };
 
-    const isRowVisible = (row: any) => {
-        if (selectedFilters.length === 0) {
-            return true;
-        }
-        return selectedFilters.some((filter) => row.notes.includes(filter));
-    };
+    const [toggleSelected, setToggleSelected] = React.useState(false);
+
     return (
         <>
             <MyAppBar />
             <Grid container spacing={1} style={{ marginLeft: ".5em", marginTop: ".5em", marginBottom: ".5em" }} columns={{ xs: 1, sm: 3 }}>
                 <Grid item>
-                    <Button variant={selectedFilters.includes('Front End') ? 'contained' : 'outlined'}
-                        onClick={() => handleFilterButtonClick('Front End')} sx={styles.button} >Front End</Button>
+                <MyToggleButtonGroup />
                 </Grid>
                 <Grid item>
-                    <Button variant={selectedFilters.includes('No Sponsership') ? 'contained' : 'outlined'}
+                    <Button variant='contained' 
+                        onClick={() => handleFilterButtonClickArray()} sx={styles.button}>Front End</Button>
+                </Grid>
+                <Grid item>
+                    <Button variant='contained'
                         onClick={() => handleFilterButtonClick('No sponsership')} sx={styles.button} >No Sponsership</Button>
                 </Grid>
                 <Grid item>
-                    <Button variant="contained" sx={styles.button} onClick={() => handleAllButtonClick()}>All</Button>
+                    <Button  variant= 'contained' sx={styles.button} onClick={() => handleAllButtonClick()}>All</Button>
                 </Grid>
             </Grid>
             <Grid>
