@@ -2,7 +2,7 @@ import React from "react"
 import { useState } from 'react';
 import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 
-export const MyToggleButtonGroup = ( {onClick} ) => {
+export const MyToggleButtonGroup = ({ onClick }) => {
     const [filters, setFilters] = useState<string[]>([]);
 
     const handleFilterChange = (
@@ -28,7 +28,6 @@ export const MyToggleButtonGroup = ( {onClick} ) => {
     };
 
     return (
-
         <ToggleButtonGroup
             aria-label="filters"
             value={filters}
