@@ -41,7 +41,7 @@ const DataTableTS = ({ givenPageSize = 25, givenPage = 0, onPageChange, onPageSi
             border: 0,
         },
     }))
-   
+
     useEffect(() => {
         fetchData([]);
     }, [])
@@ -55,51 +55,51 @@ const DataTableTS = ({ givenPageSize = 25, givenPage = 0, onPageChange, onPageSi
         setPage(0)
         onPageSizeChange && onPageSizeChange(parseInt(event.target.value, 10))
     }
+    
+    const searchValuesMap = new Map<string, string[]>([
+        ['Front End', ['Front', 'front', 'Frontend', 'frontend', 'Front End', 'front end']],
+        ['Back End', ['Back End', 'BackEnd', 'Bankend', 'Back', 'back']],
+        ['No Sponsorship', ['No Sponsorship', 'Sponsorship required']],
+    ]);
 
-    const fetchData = async (searchString:string[]) => {
-        let finalSearchString:string[] = [];
-        const frontEndArraySearchValues  = ['Front', 'front', 'Frontend', 'frontend', 'Front End', 'front end'];
-        const backEndArraySearchValues = ['Back End', 'BackEnd', 'Bankend', 'Back', 'back'];
-        const sponsorArraySearchValues = ['No Sponsorship', 'Sponsorship required'];
-        for(let i = 0;i< searchString.length;i++) {
-            if(searchString[i].includes('Front End')) {
-                finalSearchString = finalSearchString.concat(frontEndArraySearchValues);
-            }
-            if(searchString[i].includes('Back End')) {
-                finalSearchString = finalSearchString.concat(backEndArraySearchValues);
-            }
-            if(searchString[i].includes('No Sponsorship')) {
-                finalSearchString = finalSearchString.concat(sponsorArraySearchValues);
+    function getFinalSearchValues(searchStrings: string[], searchValuesMap: Map<string, string[]>): string[] {
+        const finalSearchValues: string[] = [];
+
+        for (const searchString of searchStrings) {
+            for (const [searchKey, searchValues] of searchValuesMap) {
+                if (searchString.includes(searchKey)) {
+                    finalSearchValues.push(...searchValues);
+                }
             }
         }
-     
-        let orValues = [];
-        for (let i = 0; i < finalSearchString.length; i++) {
-            orValues.push({ notes: { contains: finalSearchString[i] } });
+
+        return finalSearchValues;
+    }
+
+    async function fetchData(searchStrings: string[]) {
+        const finalSearchValues = getFinalSearchValues(searchStrings, searchValuesMap);
+
+        const filter = {
+            or: finalSearchValues.map((value) => ({ notes: { contains: value } })),
         };
 
-        let filter: ModelInternHiveFilterInput = {or: orValues};
-    
-        const filteredInternships = await API.graphql<GraphQLQuery<ListInternHivesQuery>>({
+        const { data } = await API.graphql<GraphQLQuery<ListInternHivesQuery>>({
             query: queries.listInternHives,
-            variables: { filter: filter },
+            variables: { filter },
         });
-    
-        const result2 = filteredInternships.data?.listInternHives?.items;
-        const result3 = !result2 ? [] : result2?.map((item) => {
-            return {
-                name: item ? item?.name : '',
-                location: item ? item?.location : '',
-                notes: item ? item?.notes : '',
-            };
-        });
+
+        const result3 = (data?.listInternHives?.items ?? []).map((item) => ({
+            name: item?.name ?? '',
+            location: item?.location ?? '',
+            notes: item?.notes ?? '',
+        }));
+
         setRows(result3);
-    };
-  
-    const toggleButtonClickCallback = (filters:string[]) => {
+    }
+
+    const toggleButtonClickCallback = (filters: string[]) => {
         console.log(`Inside DataTableTS callback: ${filters}`)
         fetchData(filters);
-
     }
 
     return (
@@ -107,7 +107,7 @@ const DataTableTS = ({ givenPageSize = 25, givenPage = 0, onPageChange, onPageSi
             <MyAppBar />
             <Grid container spacing={1} style={{ marginLeft: ".5em", marginTop: ".5em", marginBottom: ".5em" }} columns={{ xs: 1, sm: 3 }}>
                 <Grid item>
-                <MyToggleButtonGroup  onClick={toggleButtonClickCallback} />
+                    <MyToggleButtonGroup onClick={toggleButtonClickCallback} />
                 </Grid>
             </Grid>
             <Grid>
