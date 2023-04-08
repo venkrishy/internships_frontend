@@ -2,24 +2,31 @@ import React, { useState } from 'react'
 import { Grid } from '@mui/material'
 import { MyAppBar } from './MyAppBar';
 import { MyToggleButtonGroup } from './MyToggleButtonGroup';
-import DataTableTS  from './DataTableTS';
+import DataTable  from './DataTable';
 
 
-const Internhive = () => {
+const InternHive = () => {
     const [filters, setFilters] = useState<string[]>([]);
     console.log("Internhive Rendering");
+    const handleFilterChange = (
+        _event: React.MouseEvent<HTMLElement>,
+        updatedFilters: string[],
+    ) => {
+        setFilters(updatedFilters);
+        console.log("MyToggleButtonGroup updatedFilters=", updatedFilters);
+    };
     return (
         <>
             <MyAppBar />
             <Grid container spacing={1} style={{ marginLeft: ".5em", marginTop: ".5em", marginBottom: ".5em" }} columns={{ xs: 1, sm: 3 }}>
                 <Grid item>
-                    <MyToggleButtonGroup filters={filters} setFilters={setFilters} />
+                    <MyToggleButtonGroup filters={filters} setFilters={setFilters} onChange={handleFilterChange} />
                 </Grid>
             </Grid>
             <Grid>
-                <DataTableTS givenPageSize={100} filters={filters} />
+                <DataTable givenPageSize={100} filters={filters} />
             </Grid>
         </>
     )
 }
-export { Internhive as default }
+export { InternHive as default }

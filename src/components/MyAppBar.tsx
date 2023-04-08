@@ -1,9 +1,26 @@
 import React from "react"
-import { AppBar, Typography, Box, Toolbar, IconButton, Menu, Container, Avatar, Tooltip, MenuItem } from '@mui/material'
+import {
+    AppBar,
+    Typography,
+    Box,
+    Toolbar,
+    IconButton,
+    Menu,
+    Container,
+    Avatar,
+    Tooltip,
+    MenuItem,
+} from '@mui/material'
 import logo from "/public/logo.png";
+import { SearchBox } from "./SearchBox";
+import { MultipleSelectCheckmarks } from "./MultipleSelectCheckmarks";
+import { alpha } from "@mui/material/styles";
+
+
 export const MyAppBar = () => {
 
     const settings = ["Profile", "Account", "Dashboard", "Logout"];
+    const [selectedOptions, setSelectedOptions] = React.useState<string[]>([]);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
         null
     );
@@ -15,9 +32,9 @@ export const MyAppBar = () => {
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
-    
-    return (<AppBar position="static">
-        <Container>
+
+    return (
+        <AppBar position="static">
             <Toolbar disableGutters>
                 <img src={logo} alt="logo" />
                 <Typography
@@ -34,13 +51,17 @@ export const MyAppBar = () => {
                         textDecoration: 'none',
                         align: 'center',
                         flex: 1,
-                       //width: '150px', 
+                        //width: '150px', 
 
                     }}
                 >
                     InternHive
                 </Typography>
-
+                {/* Add the search input component */}
+                <SearchBox />
+                <Box sx={{flex: 1}} >
+                    <MultipleSelectCheckmarks />
+                </Box>
                 <Box>
                     <Tooltip title="Open settings">
                         <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -71,7 +92,7 @@ export const MyAppBar = () => {
                     </Menu>
                 </Box>
             </Toolbar>
-        </Container>
-    </AppBar>)
+        </AppBar>
+    )
 
 }

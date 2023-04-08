@@ -11,7 +11,7 @@ interface DataTableProps {
     filters?: string[]
   }
 
-const DataTableTS = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSizeChange, filters }: DataTableProps) => {
+const DataTable = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSizeChange, filters }: DataTableProps) => {
     const [data, setData] = useState<InternshipType[]>([]);
     useEffect(() => {
         console.log("DataTableTS has noticed change in filters. value= ", filters);
@@ -45,17 +45,6 @@ const DataTableTS = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSi
             border: 0,
         },
     }))
-
-    const handleChangePage = (event: any, newPage: any) => {
-        setPage(newPage)
-        onPageChange && onPageChange(newPage)
-    }
-    const handleChangeRowsPerPage = (event: any) => {
-        setPageSize(parseInt(event.target.value, 10))
-        setPage(0)
-        onPageSizeChange && onPageSizeChange(parseInt(event.target.value, 10))
-    }
-
 
     return (
             <Grid>
@@ -99,4 +88,4 @@ const DataTableTS = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSi
             </Grid>
     )
 }
-export { DataTableTS as default }
+export { DataTable as default }

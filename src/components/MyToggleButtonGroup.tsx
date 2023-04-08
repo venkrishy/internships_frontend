@@ -4,20 +4,13 @@ import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 
 interface Props {
     filters : string[],
-    setFilters : (filters: any) => void
+    onChange?: ( _event: React.MouseEvent<HTMLElement>,
+        updatedFilters: string[],) => void
 }
 
-export const MyToggleButtonGroup = ({ filters, setFilters } : Props) => {
+export const MyToggleButtonGroup = ({ filters, onChange } : Props) => {
 
     console.log("Rendering MyToggleButtonGroup");
-
-    const handleFilterChange = (
-        _event: React.MouseEvent<HTMLElement>,
-        updatedFilters: string[],
-    ) => {
-        setFilters(updatedFilters);
-        console.log("MyToggleButtonGroup updatedFilters=", updatedFilters);
-    };
 
     const buttonStyle = {
         border: 'none',
@@ -37,7 +30,7 @@ export const MyToggleButtonGroup = ({ filters, setFilters } : Props) => {
         <ToggleButtonGroup
             aria-label="filters"
             value={filters}
-            onChange={handleFilterChange}
+            onChange={onChange}
             size="small"
         >
             <ToggleButton
