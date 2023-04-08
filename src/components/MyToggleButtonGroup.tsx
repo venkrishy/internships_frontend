@@ -2,15 +2,21 @@ import React from "react"
 import { useState } from 'react';
 import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 
-export const MyToggleButtonGroup = ({ onClick }) => {
-    const [filters, setFilters] = useState<string[]>([]);
+interface Props {
+    filters : string[],
+    setFilters : (filters: any) => void
+}
+
+export const MyToggleButtonGroup = ({ filters, setFilters } : Props) => {
+
+    console.log("Rendering MyToggleButtonGroup");
 
     const handleFilterChange = (
         _event: React.MouseEvent<HTMLElement>,
         updatedFilters: string[],
     ) => {
         setFilters(updatedFilters);
-        onClick(updatedFilters);
+        console.log("MyToggleButtonGroup updatedFilters=", updatedFilters);
     };
 
     const buttonStyle = {
