@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import { Button, ToggleButton, Grid, Paper, Table, styled, TableRow, TableCell, TableHead, TableBody, TableContainer, TablePagination, tableCellClasses, Typography, Box, Toolbar, IconButton, Menu, Container, Avatar, Tooltip, MenuItem, InputBase, alpha, TableSortLabel } from '@mui/material'
+import { Grid, Paper, Table, styled, TableRow, TableCell, TableHead, TableBody, TableContainer, TablePagination, tableCellClasses, Typography, Box, Toolbar, IconButton, Menu, Container, Avatar, Tooltip, MenuItem, InputBase, alpha, TableSortLabel } from '@mui/material'
 import useConfig from "./useConfig";
 import InternshipType from "./InternshipType";
 import { MyToggleButtonGroup } from "./MyToggleButtonGroup";
-
-
 import { API } from 'aws-amplify';
 import * as queries from '../graphql/queries';
 import { GraphQLQuery } from '@aws-amplify/api';
 import { ListInternHivesQuery, ModelInternHiveFilterInput } from "../API";
 import { MyAppBar } from './MyAppBar';
+import { forEach } from 'core-js/core/array';
 
 
 const DataTableTS = ({ givenPageSize = 25, givenPage = 0, onPageChange, onPageSizeChange, onRowClick }: any) => {
@@ -21,7 +20,6 @@ const DataTableTS = ({ givenPageSize = 25, givenPage = 0, onPageChange, onPageSi
         { id: 'location', label: 'Location', minWidth: 170 },
         { id: 'notes', label: 'Notes', minWidth: 170 },
     ]
-    const [selected, setSelected] = useState([0])
     const [page, setPage] = useState(givenPage)
     const [pageSize, setPageSize] = useState(givenPageSize)
 
@@ -43,49 +41,11 @@ const DataTableTS = ({ givenPageSize = 25, givenPage = 0, onPageChange, onPageSi
             border: 0,
         },
     }))
-
-    const styles = {
-        button: {
-            borderRadius: '20px',
-            bgcolor: 'transparent',
-            color: '#606060',
-            height: '100%',
-            lineHeight: '80%',
-            padding: '10px',
-            '&:hover': {
-                bgcolor: '#ccc'
-            }
-        }
-    };
-
-    async function fetchData() {
-        try {
-            let filter: ModelInternHiveFilterInput = { name: { contains: "Amazon" } };
-            const allInternships = await API.graphql<GraphQLQuery<ListInternHivesQuery>>({ query: queries.listInternHives });
-
-            console.log("allInternships", allInternships);
-
-
-            const result2 = allInternships.data?.listInternHives?.items;
-            const result3: InternshipType[] = !result2 ? [] : result2?.map((item) => {
-                return {
-                    name: item ? item?.name : "",
-                    location: item ? item?.location : "",
-                    notes: item ? item?.notes : "",
-                }
-            })
-            setRows(result3);
-        } catch (error) {
-            console.log("Error fetching data: ", error);
-        }
-    }
+   
     useEffect(() => {
-        fetchData();
+        fetchData([]);
     }, [])
 
-    const handleAllButtonClick = () => {
-        fetchData();
-    };
     const handleChangePage = (event: any, newPage: any) => {
         setPage(newPage)
         onPageChange && onPageChange(newPage)
@@ -95,34 +55,27 @@ const DataTableTS = ({ givenPageSize = 25, givenPage = 0, onPageChange, onPageSi
         setPage(0)
         onPageSizeChange && onPageSizeChange(parseInt(event.target.value, 10))
     }
-    const isSelected = (id: number) => selected.indexOf(id) !== -1
 
-    const handleClick = (event: any, id: number) => {
-        const selectedIndex = selected.indexOf(id)
-        let newSelected: Array<number> = []
-        if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, id)
-        } else if (selectedIndex === 0) {
-            newSelected = newSelected.concat(selected.slice(1))
-        } else if (selectedIndex === selected.length - 1) {
-            newSelected = newSelected.concat(selected.slice(0, -1))
-        } else if (selectedIndex > 0) {
-            newSelected = newSelected.concat(
-                selected.slice(0, selectedIndex),
-                selected.slice(selectedIndex + 1),
-            )
+    const fetchData = async (searchString:string[]) => {
+        let finalSearchString:string[] = [];
+        const frontEndArraySearchValues  = ['Front', 'front', 'Frontend', 'frontend', 'Front End', 'front end'];
+        const backEndArraySearchValues = ['Back End', 'BackEnd', 'Bankend', 'Back', 'back'];
+        const sponsorArraySearchValues = ['No Sponsorship', 'Sponsorship required'];
+        for(let i = 0;i< searchString.length;i++) {
+            if(searchString[i].includes('Front End')) {
+                finalSearchString = finalSearchString.concat(frontEndArraySearchValues);
+            }
+            if(searchString[i].includes('Back End')) {
+                finalSearchString = finalSearchString.concat(backEndArraySearchValues);
+            }
+            if(searchString[i].includes('No Sponsorship')) {
+                finalSearchString = finalSearchString.concat(sponsorArraySearchValues);
+            }
         }
-        setSelected(newSelected)
-    }
-
-    const handleFilterButtonClickArray = async () => {
-        const frontEndArraySearchValues  = ['Front End', 'Front', 'front'];
-        const backEndArraySearchValues = ['Back End', 'Back', 'back'];
-        const searchString : string[] | never[] = frontEndArraySearchValues.concat(backEndArraySearchValues);
-        
+     
         let orValues = [];
-        for (let i = 0; i < searchString.length; i++) {
-            orValues.push({ notes: { contains: searchString[i] } });
+        for (let i = 0; i < finalSearchString.length; i++) {
+            orValues.push({ notes: { contains: finalSearchString[i] } });
         };
 
         let filter: ModelInternHiveFilterInput = {or: orValues};
@@ -142,44 +95,19 @@ const DataTableTS = ({ givenPageSize = 25, givenPage = 0, onPageChange, onPageSi
         });
         setRows(result3);
     };
+  
+    const toggleButtonClickCallback = (filters:string[]) => {
+        console.log(`Inside DataTableTS callback: ${filters}`)
+        fetchData(filters);
 
-    const handleFilterButtonClick = async (searchString: string) => {
-        let filter: ModelInternHiveFilterInput = { notes: { contains: searchString } };
-        const filteredInternships = await API.graphql<GraphQLQuery<ListInternHivesQuery>>({
-            query: queries.listInternHives,
-            variables: { filter: filter },
-        });
-
-        const result2 = filteredInternships.data?.listInternHives?.items;
-        const result3 = !result2 ? [] : result2?.map((item) => {
-            return {
-                name: item ? item?.name : '',
-                location: item ? item?.location : '',
-                notes: item ? item?.notes : '',
-            };
-        });
-        setRows(result3);
-    };
-
-    const [toggleSelected, setToggleSelected] = React.useState(false);
+    }
 
     return (
         <>
             <MyAppBar />
             <Grid container spacing={1} style={{ marginLeft: ".5em", marginTop: ".5em", marginBottom: ".5em" }} columns={{ xs: 1, sm: 3 }}>
                 <Grid item>
-                <MyToggleButtonGroup />
-                </Grid>
-                <Grid item>
-                    <Button variant='contained' 
-                        onClick={() => handleFilterButtonClickArray()} sx={styles.button}>Front End</Button>
-                </Grid>
-                <Grid item>
-                    <Button variant='contained'
-                        onClick={() => handleFilterButtonClick('No sponsership')} sx={styles.button} >No Sponsership</Button>
-                </Grid>
-                <Grid item>
-                    <Button  variant= 'contained' sx={styles.button} onClick={() => handleAllButtonClick()}>All</Button>
+                <MyToggleButtonGroup  onClick={toggleButtonClickCallback} />
                 </Grid>
             </Grid>
             <Grid>
@@ -196,17 +124,12 @@ const DataTableTS = ({ givenPageSize = 25, givenPage = 0, onPageChange, onPageSi
                         </TableHead>
                         <TableBody  >
                             {rows.slice(page * pageSize, page * pageSize + pageSize).map((row: any) => {
-                                const isItemSelected = isSelected(row.id)
-                                const labelId = `enhanced-table-checkbox-${row.id}`
                                 return (
                                     <StyledTableRow
                                         hover
-                                        onClick={(event) => handleClick(event, row.id)}
                                         role="checkbox"
-                                        aria-checked={isItemSelected}
                                         tabIndex={-1}
                                         key={row.id}
-                                        selected={isItemSelected}
                                     >
                                         {columns.map((column: any) => {
                                             const value = row[column.id]

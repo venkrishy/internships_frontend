@@ -2,72 +2,56 @@ import React from "react"
 import { useState } from 'react';
 import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 
-export const MyToggleButtonGroup = () => {
-    const [selectedButton, setSelectedButton] = useState<string | null>(null);
+export const MyToggleButtonGroup = ( {onClick} ) => {
+    const [filters, setFilters] = useState<string[]>([]);
 
-    const handleButtonToggle = (
-        event: React.MouseEvent<HTMLElement>,
-        newSelectedButton: string | null,
+    const handleFilterChange = (
+        _event: React.MouseEvent<HTMLElement>,
+        updatedFilters: string[],
     ) => {
-        setSelectedButton(newSelectedButton);
+        setFilters(updatedFilters);
+        onClick(updatedFilters);
     };
 
     const buttonStyle = {
         border: 'none',
         borderRadius: '20px',
-        padding: '10px 20px',
+        padding: '11px 22px',
         cursor: 'pointer',
+        textTransform: "none",
+        "&.Mui-selected, &.Mui-selected:hover": {
+            color: "gray",
+            backgroundColor: "#f6f6f6",
+            boxShadow: `inset 0 0 5px #0e2b2c`,
+        }
+
     };
 
     return (
 
         <ToggleButtonGroup
-            value={selectedButton}
-            onChange={handleButtonToggle}
+            aria-label="filters"
+            value={filters}
+            onChange={handleFilterChange}
+            size="small"
         >
             <ToggleButton
                 value="Front End"
-                sx={{
-                    ...buttonStyle,
-                    backgroundColor:
-                        selectedButton === 'FrontEnd' ? 'gray' : 'white',
-                    boxShadow:
-                        selectedButton === 'FrontEnd'
-                            ? `inset 0 0 5px rgba(0, 0, 0, 0.5)`
-                            : '',
-                }}
+                sx={buttonStyle}
             >
-                {selectedButton === 'FrontEnd' ? 'Selected FrontEnd' : 'FrontEnd'}
+                Front End
             </ToggleButton>
             <ToggleButton
                 value="Back End"
-                sx={{
-                    ...buttonStyle,
-                    backgroundColor:
-                        selectedButton === 'Backend' ? 'gray' : 'white',
-                    boxShadow:
-                        selectedButton === 'Backend'
-                            ? `inset 0 0 5px rgba(0, 0, 0, 0.5)`
-                            : '',
-                }}
+                sx={buttonStyle}
             >
-                {selectedButton === 'Backend' ? 'Selected Backend' : 'Backend'}
+                Back End
             </ToggleButton>
             <ToggleButton
-                value="No Sponsership"
-                sx={{
-                    ...buttonStyle,
-                    backgroundColor:
-                        selectedButton === 'NoSponsership' ? 'gray' : 'white',
-                    boxShadow:
-                        selectedButton === 'NoSponsership'
-                            ? `inset 0 0 5px rgba(0, 0, 0, 0.5)`
-                            : '',
-                }}
+                value="No Sponsorship"
+                sx={buttonStyle}
             >
-                {selectedButton === 'NoSponsership'
-                    ? 'Selected No Sponsership'
-                    : 'No Sponsership'}
+                No Sponsorship
             </ToggleButton>
         </ToggleButtonGroup>
     );
