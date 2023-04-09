@@ -14,7 +14,7 @@ import {
 import logo from "/public/logo.png";
 import { SearchBox } from "./SearchBox";
 import { MultipleSelectCheckmarks } from "./MultipleSelectCheckmarks";
-import { alpha } from "@mui/material/styles";
+
 
 
 export const MyAppBar = () => {
@@ -57,11 +57,6 @@ export const MyAppBar = () => {
                 >
                     InternHive
                 </Typography>
-                {/* Add the search input component */}
-                <SearchBox />
-                <Box sx={{flex: 1}} >
-                    <MultipleSelectCheckmarks />
-                </Box>
                 <Box>
                     <Tooltip title="Open settings">
                         <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
