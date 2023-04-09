@@ -8,7 +8,7 @@ interface MultiSelectCheckboxProps {
   onAdditionalChange: ( additionalFilters: string[]) => void
 }
 
-export const MultiSelectCheckbox: React.FC<MultiSelectCheckboxProps> = ({ options, onAdditionalChange }) => {
+export const MultiSelectCheckbox = ({ options, onAdditionalChange } : MultiSelectCheckboxProps) => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   const handleChange = (event: SelectChangeEvent<typeof selectedItems>) => {
@@ -23,11 +23,12 @@ export const MultiSelectCheckbox: React.FC<MultiSelectCheckboxProps> = ({ option
 
 
   return (
-    <FormControl fullWidth sx={{
+    <FormControl fullWidth variant="filled" sx={{
       m: 0,
       backgroundColor: alpha("#fff", 0.15),
       "&:hover": {
         backgroundColor: alpha("#fff", 0.25),
+        minWidth: 300
       }
 
     }}>

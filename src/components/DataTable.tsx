@@ -15,7 +15,6 @@ interface DataTableProps {
 const DataTable = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSizeChange, filters, additionalFilters }: DataTableProps) => {
     const [data, setData] = useState<InternshipType[]>([]);
     useEffect(() => {
-        console.log("DataTableTS has noticed change in additionalFilters. value= ", additionalFilters);
         const combinedFilters = filters.concat(additionalFilters);
         console.log("DataTableTS combinedFilters. value= ", combinedFilters);
         fetchData(combinedFilters ?? [], setData);
@@ -23,9 +22,9 @@ const DataTable = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSize
 
 
     const columns = [
-        { id: 'name', label: 'Name', minWidth: 170 },
-        { id: 'location', label: 'Location', minWidth: 170 },
-        { id: 'notes', label: 'Notes', minWidth: 170 },
+        { id: 'name', label: 'Name', width: '20%', minWidth: 170 },
+        { id: 'location', label: 'Location', width: '30%', minWidth: 170 },
+        { id: 'notes', label: 'Notes', width: '50%', minWidth: 170 },
     ]
     const [page, setPage] = useState(givenPage)
     const [pageSize, setPageSize] = useState(givenPageSize)
@@ -36,13 +35,10 @@ const DataTable = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSize
             color: theme.palette.common.black,
         },
         [`&.${tableCellClasses.body}`]: {
-            fontSize: 14,
+            fontSize: 10,
         },
     }))
     const StyledTableRow = styled(TableRow)(({ theme }: any) => ({
-        '&:nth-of-type(odd)': {
-            backgroundColor: theme.palette.action.hover,
-        },
         // hide last border
         '&:last-child td, &:last-child th': {
             border: 0,
@@ -50,13 +46,13 @@ const DataTable = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSize
     }))
 
     return (
-            <Grid>
+
                 <TableContainer component={Paper}>
                     <Table aria-label="customized table">
                         <TableHead>
                             <TableRow>
                                 {columns.map((column: any) => (
-                                    <StyledTableCell key={column.id} align={column.align}>
+                                    <StyledTableCell width={column.width} key={column.id} align={column.align}>
                                         {column.label}
                                     </StyledTableCell>
                                 ))}
@@ -66,7 +62,6 @@ const DataTable = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSize
                             {data?.map((row: any) => {
                                 return (
                                     <StyledTableRow
-                                        hover
                                         role="checkbox"
                                         tabIndex={-1}
                                         key={row.id}
@@ -75,7 +70,7 @@ const DataTable = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSize
                                             const value = row[column.id]
                                             const value2 = column.format && typeof value === 'number' ? column.format(value) : value
                                             return (
-                                                <StyledTableCell key={column.id} align={column.align}>
+                                                <StyledTableCell width={column.width} key={column.id} align={column.align}>
                                                     <div dangerouslySetInnerHTML={{ __html: value2 }} />
                                                 </StyledTableCell>
                                             )
@@ -88,7 +83,6 @@ const DataTable = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSize
                     </Table>
                     
                 </TableContainer>
-            </Grid>
     )
 }
 export { DataTable as default }
