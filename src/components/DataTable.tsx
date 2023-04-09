@@ -8,15 +8,18 @@ interface DataTableProps {
     givenPage?: number;
     onPageChange?: (newPage: number) => void;
     onPageSizeChange?: (newPageSize: number) => void;
-    filters?: string[]
+    filters: string[];
+    additionalFilters: string[];
   }
 
-const DataTable = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSizeChange, filters }: DataTableProps) => {
+const DataTable = ({ givenPageSize = 10, givenPage = 0, onPageChange, onPageSizeChange, filters, additionalFilters }: DataTableProps) => {
     const [data, setData] = useState<InternshipType[]>([]);
     useEffect(() => {
-        console.log("DataTableTS has noticed change in filters. value= ", filters);
-        fetchData(filters ?? [], setData);
-    }, [filters])
+        console.log("DataTableTS has noticed change in additionalFilters. value= ", additionalFilters);
+        const combinedFilters = filters.concat(additionalFilters);
+        console.log("DataTableTS combinedFilters. value= ", combinedFilters);
+        fetchData(combinedFilters ?? [], setData);
+    }, [filters, additionalFilters])
 
 
     const columns = [

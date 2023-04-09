@@ -1,20 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MenuItem, Checkbox, ListItemText, FormControl, InputLabel, Select, SelectChangeEvent } from '@mui/material';
 import { alpha } from "@mui/material/styles";
+import fetchData from './FetchData';
 
 interface MultiSelectCheckboxProps {
   options: string[];
+  onAdditionalChange: ( additionalFilters: string[]) => void
 }
 
-export const MultiSelectCheckbox: React.FC<MultiSelectCheckboxProps> = ({ options }) => {
+export const MultiSelectCheckbox: React.FC<MultiSelectCheckboxProps> = ({ options, onAdditionalChange }) => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   const handleChange = (event: SelectChangeEvent<typeof selectedItems>) => {
     const {
       target: { value },
     } = event;
-    setSelectedItems(typeof value === 'string' ? value.split(',') : value);
+    const items = (typeof value === 'string' ? value.split(',') : value);
+    setSelectedItems(items);
+    console.log("MultiSelectCheckbox selectedItems=", items);
+    onAdditionalChange(items);
   };
+
 
   return (
     <FormControl fullWidth sx={{
